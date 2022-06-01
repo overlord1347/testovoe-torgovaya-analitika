@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    li {
+        background: #ddd;
+        border: 1px solid #ddd;
+        padding: 5px;
+        margin: 5px;
+        width: 200px;
+        list-style-type: none;
+    }
+
+    .cache_list li {
+        cursor: pointer;
+    }
+
+    .cache_list li > a {
+        display: block;
+        text-decoration: none;
+    }
+</style>
+
+<ul class="cache_list">
+</ul>
+<script>
+    fetch('api/redis', {
+        method: 'GET',
+        headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        },
+
+    }).then(function (response) {
+        if (response.ok) {
+            response.json().then(function (json) {
+                json_data = json.data
+                let elemnt = document.querySelector(".cache_list");
+                for(let i in json_data) {
+                    console.log(i);
+                    const li = document.createElement('li');
+                    li.textContent = i + ' ' + json_data[i];
+                    const link = document.createElement('a');
+                    link.href = "#";
+                    link.classList.add('remove');
+                    link.textContent = 'delete';
+                    link.id = i;
+                    link.addEventListener('click', showMore);
+                    li.appendChild(link);
+                    elemnt.appendChild(li);
+                }
+            })
+        }
+    })
+
+    function showMore(){
+        var id = this.id
+        fetch('api/redis/' + id, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json; charset=UTF-8"
+            },
+
+        }).then(function (response) {
+            if (response.ok) {
+                console.log(id)
+                document.getElementById(id).parentElement.remove()
+            }
+        })
+    }
+</script>
+</body>
+</html>
+
